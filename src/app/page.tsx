@@ -37,7 +37,7 @@ export default function Home() {
               <Book 
                 bookId={
                   searchType === 'Title' ? book.cover_edition_key :
-                  searchType === 'Author' ? book.author_key.join(", ") :
+                  searchType === 'Author' ? book.author_key ? book.author_key.join(", ") : "Author ID not found" :
                   searchType === 'Genre' ? book.id : "Genre Not Found"
                 }
                 bookName={
@@ -45,7 +45,7 @@ export default function Home() {
                   searchType === 'Author' ? book.name :
                   searchType === 'Genre' ? book.genre_name : "Genre Not Found"
                 } 
-                authorName={book.author_name.join(", ")} 
+                authorName={book.author_name ? book.author_name.join(", ") : "Author Name Not Found"} 
                 key={index} 
                 imageUrl={
                   searchType === 'Title' ? book.cover_i ? `${GET_IMAGE_URL}/${book.cover_i}.jpg` : NOT_FOUND_IMAGE_URL : 

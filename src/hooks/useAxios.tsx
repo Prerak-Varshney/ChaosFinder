@@ -1,37 +1,93 @@
+// "use client";
+// import { useState, useEffect } from "react";
+// import { BASE_URL, FETCH_LIMIT } from "../constants/constants";
+// import axios from "axios";
+
+// const useAxios = (url: string) => {
+//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   const [data, setData] = useState<any>(null);
+//   const [error, setError] = useState<string | null>(null);
+//   const [isLoading, setIsLoading] = useState<boolean>(true);
+//   const [responseCount, setResponseCount] = useState<number>(0);
+//   const [pageCount, setPageCount] = useState<number>(0);
+
+//   const fetchData = async () => {
+//     if(!url) return;
+
+//     const controller = new AbortController();
+
+//     setIsLoading(true);
+//     try {
+//       const response = await axios.get(`${BASE_URL}${url}`, { signal: controller.signal });
+//       setData(response.data);
+//       setResponseCount(response.data.numFound);
+//       setPageCount(Math.ceil(response.data.numFound / FETCH_LIMIT));
+//     } catch (err) {
+//       if (axios.isCancel(err)) {
+//         console.log("Request canceled", err.message);
+//       } else {
+//         setError("Error fetching data");
+//         console.error(err);
+//       }
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     fetchData();
+//   }, [url]);
+
+//   return { data, error, isLoading, responseCount, pageCount, refetch: fetchData };
+// };
+
+// export default useAxios;
+
+
 "use client";
-import { useState, useEffect, useCallback } from "react";
-import { BASE_URL } from "../constants/constants";
+import { useState, useEffect } from "react";
+import { BASE_URL, FETCH_LIMIT } from "../constants/constants";
 import axios from "axios";
-import { FETCH_LIMIT } from "../constants/constants";
 
 const useAxios = (url: string) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [responseCount, setResponseCount] = useState<number>(0);
   const [pageCount, setPageCount] = useState<number>(0);
-  
-  const fetchData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const response = await axios.get(`${BASE_URL}${url}`);
-      setData(response.data);
-      setResponseCount(response.data.numFound);
-      setPageCount(Math.ceil(response.data.numFound / FETCH_LIMIT));
-    } catch (err) {
-      setError("Error fetching data");
-      console.log(err);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [url]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!url) return;
 
-  return { data, error, isLoading, responseCount, pageCount, refetch: fetchData };
+    const controller = new AbortController();
+    const delay = setTimeout(async () => {
+      setIsLoading(true);
+      try {
+        const response = await axios.get(`${BASE_URL}${url}`, {
+          signal: controller.signal,
+        });
+
+        setData(response.data);
+        setResponseCount(response.data.numFound);
+        setPageCount(Math.ceil(response.data.numFound / FETCH_LIMIT));
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          console.log("Request canceled:", err.message);
+        } else {
+          setError("Error fetching data");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    }, 400); // debounce (400ms)
+
+    return () => {
+      clearTimeout(delay);
+      controller.abort(); // cancel old request when url changes
+    };
+  }, [url]);
+
+  return { data, error, isLoading, responseCount, pageCount };
 };
 
 export default useAxios;
