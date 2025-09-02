@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { BRAND_NAME, SEARCH_TYPES } from "@/app/constants/constants";
+import { BRAND_NAME, SEARCH_TYPES } from "@/constants/constants";
 import Select from "./Select";
 
 interface NavbarProps {

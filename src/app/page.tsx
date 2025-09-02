@@ -2,11 +2,11 @@
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Book from "@/components/Book";
-import useAxios from "./hooks/useAxios";
+import useAxios from "../hooks/useAxios";
 import ResultFound from "@/components/ResultFound";
 import Loading from "@/components/Loading";
 import Pagination from "@/components/Pagination";
-import { FETCH_LIMIT, NOT_FOUND_IMAGE_URL, GET_IMAGE_URL } from "./constants/constants";
+import { FETCH_LIMIT, NOT_FOUND_IMAGE_URL, GET_IMAGE_URL } from "../constants/constants";
 
 export default function Home() {
 
@@ -35,12 +35,17 @@ export default function Home() {
           data && data.docs.map((book: any, index: number) => {
             return (
               <Book 
+                bookId={
+                  searchType === 'Title' ? book.cover_edition_key :
+                  searchType === 'Author' ? book.author_key.join(", ") :
+                  searchType === 'Genre' ? book.id : "Genre Not Found"
+                }
                 bookName={
                   searchType === 'Title' ? book.title :
                   searchType === 'Author' ? book.name :
                   searchType === 'Genre' ? book.genre_name : "Genre Not Found"
                 } 
-                authorName={book.author_name} 
+                authorName={book.author_name.join(", ")} 
                 key={index} 
                 imageUrl={
                   searchType === 'Title' ? book.cover_i ? `${GET_IMAGE_URL}/${book.cover_i}.jpg` : NOT_FOUND_IMAGE_URL : 
@@ -56,11 +61,9 @@ export default function Home() {
   );
 }
 
-
-// Put on github
 // When clicked on authors there should be all their works
-// Disable Genre
 // When click on book show other details of book and the other works from the same author
 // Add to favourite
 // Responsive and Design edit
+// FavIcon and stuff
 // Deploy
