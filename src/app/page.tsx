@@ -9,19 +9,35 @@ import Pagination from "@/components/Pagination";
 import Error from "@/components/Error";
 import { FETCH_LIMIT, NOT_FOUND_IMAGE_URL, GET_IMAGE_URL } from "../constants/constants";
 
+interface ApiResponse {
+  docs?: Array<{
+    cover_edition_key?: string;
+    title?: string;
+    name?: string;
+    genre_name?: string;
+    key?: string;
+    author_name?: string[];
+    cover_i?: string;
+    genre_image?: string;
+  }>;
+}
+
 export default function Home() {
 
   const [query, setQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [searchType, setSearchType] = useState<string>("Title");
+  const [bookData, setBookData] = useState<ApiResponse | null>(null);
 
   const { data, error, isLoading, responseCount, pageCount } = useAxios(searchType === 'Title' ? `/search.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}` : searchType === 'Author' ? `/search/authors.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}` : searchType === 'Genre' ? `` : ``);
 
+  setBookData(data);
+
   useEffect(() => {console.log(data)}, [data]);
 
-  // useEffect(() => {
-  //   if(query === "") setPage(0);
-  // }, [query])
+  useEffect(() => {
+    if(query === "") setPage(0);
+  }, [query]);
 
   useEffect(() => {
     if(searchType === 'Genre') setQuery('');
@@ -43,11 +59,11 @@ export default function Home() {
             {
               isLoading ? <div className={`w-full h-[calc(100vh-5rem)]`}><Loading /></div> : 
               (
-                data ? (
+                bookData ? (
                   <div className={`w-full h-[calc(100vh-7.5rem)] gap-y-4 place-items-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 bg-[var(--background)] text-[var(--foreground)] overflow-x-hidden overflow-y-scroll scroll-smooth py-3`}>
                   {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    data.docs ? data.docs.map((book: any, index: number) => (
+                    bookData.docs ? bookData.docs.map((book: any, index: number) => (
                       <Card 
                         searchType={searchType}
                         bookId={
