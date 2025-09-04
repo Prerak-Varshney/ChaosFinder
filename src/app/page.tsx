@@ -58,8 +58,7 @@ export default function Home() {
         <Pagination page={page} setPage={setPage} pageCount={pageCount} />
       </div>
       {
-        // searchType === 'Genre' && !shouldFetch ? <div className={`w-full h-[calc(100vh-5rem)] flex items-center justify-center text-black text-2xl font-bold`}><h1>Comming Soon...</h1></div> :  (
-        !shouldFetch ? <div className={`w-full h-[calc(100vh-5rem)]`}><Welcome /></div> : searchType === 'Genre' && !shouldFetch ? <div className={`w-full h-[calc(100vh-5rem)] flex items-center justify-center text-black text-2xl font-bold`}><h1>Comming Soon...</h1></div> : (
+        searchType === 'Genre' && !shouldFetch ? <div className={`w-full h-[calc(100vh-5rem)] flex items-center justify-center text-black text-2xl font-bold`}><h1>Comming Soon...</h1></div> : !shouldFetch ? <div className={`w-full h-[calc(100vh-5rem)]`}><Welcome /></div> : (
           <>
             {
               isLoading ? <div className={`w-full h-[calc(100vh-5rem)]`}><Loading /></div> : 
