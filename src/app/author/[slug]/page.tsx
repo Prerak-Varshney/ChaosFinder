@@ -7,6 +7,7 @@ import ResultFound from "@/components/ResultFound";
 import Pagination from "@/components/Pagination";
 import {FETCH_LIMIT, NOT_FOUND_IMAGE_URL} from "@/constants/constants";
 import Loading from "@/components/Loading";
+import Error from "@/components/Error";
 
 const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     const { slug } = use(params);
@@ -34,26 +35,33 @@ const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                 <Pagination page={page} setPage={setPage} pageCount={pageCount} />
             </div>
             {
-                isLoading ? <div className={`w-full h-[calc(100vh-7.5rem)]`}><Loading /></div> : 
-                data ? (
-                    <div className={`w-full h-[calc(100vh-7.5rem)] gap-y-4 place-items-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 bg-[var(--background)] text-[var(--foreground)] overflow-x-hidden overflow-y-scroll scroll-smooth py-3`}>
-                        {
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            data.entries ? data.entries.map((book: any, index: number) => (
-                                <Card 
-                                    key={index}
-                                    searchType={"Title"}
-                                    bookName={book.title}
-                                    imageUrl={NOT_FOUND_IMAGE_URL}
-                                    authorName={""}
-                                    // bookId={book.id}
-                                    authorId={authorId}
-                                />
-                            )) : <pre>No Data Entries Found</pre>
-                        } 
-                    </div>
-                ) : <pre>{error ? `Error: ${error}` : "No Data Found"}</pre>
-            }
+                searchType === 'Genre' ? <div className={`w-full h-[calc(100vh-5rem)] flex items-center justify-center text-black text-2xl font-bold`}><h1>Comming Soon...</h1></div> : (
+                <div>
+                    {
+                        isLoading ? <div className={`w-full h-[calc(100vh-5rem)]`}><Loading /></div> : 
+                        (
+                            data ? (
+                            <div className={`w-full h-[calc(100vh-7.5rem)] gap-y-4 place-items-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 bg-[var(--background)] text-[var(--foreground)] overflow-x-hidden overflow-y-scroll scroll-smooth py-3`}>
+                            {
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                data.entries ? data.entries.map((book: any, index: number) => (
+                                    <Card 
+                                        key={index}
+                                        searchType={"Title"}
+                                        bookName={book.title}
+                                        imageUrl={NOT_FOUND_IMAGE_URL}
+                                        authorName={""}
+                                        // bookId={book.id}
+                                        authorId={authorId}
+                                    />
+                                )) : <pre>No Data Entries Found</pre>
+                            } 
+                            </div>
+                            ) : <div className="w-full h-[calc(100vh-5rem)]">{error ? <Error error={error} /> : "No Data Found"}</div>
+                        )
+                    }
+                </div>
+            )}
         </div>
     )
 }

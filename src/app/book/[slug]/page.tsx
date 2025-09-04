@@ -1,5 +1,8 @@
 "use client";
 import useAxios from "@/hooks/useAxios";
+import Navbar from "@/components/Navbar";
+import Loading from "@/components/Loading";
+import Error from "@/components/Error";
 import { use } from "react";
 
 const BookPage = ({ params }: { params: Promise<{ slug: string }> }) => {
@@ -11,8 +14,9 @@ const BookPage = ({ params }: { params: Promise<{ slug: string }> }) => {
 
   return (
     <div>
+      {/* <Navbar /> */}
       <h1>Book: {decodeURIComponent(bookId)}</h1>
-      <pre>{isLoading ? "Loading..." : error ? `Error: ${error}` : JSON.stringify(data, null, 2)}</pre>
+      <div>{isLoading ? <Loading /> : error ? <Error error={error} /> : JSON.stringify(data, null, 2)}</div>
     </div>
   );
 };
