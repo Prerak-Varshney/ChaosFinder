@@ -22,8 +22,9 @@ const useAxios = (url: string, type: "book" | "author" = "book") => {
         });
 
         setData(response.data);
-        setResponseCount(() => type === 'book' ? response.data.numFound : response.data.size);
-        setPageCount(Math.ceil(responseCount / FETCH_LIMIT));
+        const count = type === "book" ? response.data.numFound : response.data.size;
+        setResponseCount(count);
+        setPageCount(Math.ceil(count / FETCH_LIMIT));
 
       } catch (err) {
         if (axios.isCancel(err)) {

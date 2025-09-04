@@ -10,11 +10,10 @@ import Loading from "@/components/Loading";
 import Error from "@/components/Error";
 
 interface ApiResponse {
-  entries?: Array<{
+    entries?: Array<{
     title?: string;
-    key?: string;
+    // key?: string;
   }>;
-  size?: number;
 }
 
 const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
@@ -24,7 +23,6 @@ const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     const [page, setPage] = useState<number>(1);
     const [authorData, setAuthorData] = useState<ApiResponse | null>(null);
 
-    // slug looks lik OL23919A&page=1&limit=20 i want only OL23919A
     const authorId = decodeURIComponent(slug).split("&")[0];
 
     const { data, error, isLoading, responseCount, pageCount } = useAxios(`/authors/${authorId}/works.json?&page=${page}&limit=${FETCH_LIMIT}&offset=${page>0 ? (page-1)*FETCH_LIMIT : 0}`, "author");
@@ -38,11 +36,11 @@ const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     return (
         <div className={`w-full h-full`}>
             <div className={`w-full h-20`}>
-                <Navbar query={query} setQuery={setQuery} searchType={searchType} setSearchType={setSearchType} />
+                <Navbar query={query} setQuery={setQuery} searchType={searchType} setSearchType={setSearchType} isSearchHidden={true} />
             </div>
-            <div className={`w-full h-10 flex items-center justify-between`}>
+            <div className={`w-full ${isLoading || error ? 'hidden' : 'flex'} h-10 items-center justify-between`}>
                 <ResultFound count={responseCount} />
-                <pre>Author Id: {authorId}</pre>
+                {/* <pre>Author Id: {authorId}</pre> */}
                 <Pagination page={page} setPage={setPage} pageCount={pageCount} />
             </div>
             {

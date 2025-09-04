@@ -43,7 +43,7 @@ export default function Home() {
   // useEffect(() => {console.log(data)}, [data]);
 
   useEffect(() => {
-    if(query.length <= 3 || searchType === 'Genre') setPage(0);
+    if(query.length <= 3 || searchType === 'Genre') setPage(1);
   }, [query, searchType]);
 
 
