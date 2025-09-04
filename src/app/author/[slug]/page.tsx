@@ -1,0 +1,61 @@
+"use client";
+import { use, useState } from "react";
+import useAxios from "@/hooks/useAxios";
+import Card from "@/components/Card";
+import Navbar from "@/components/Navbar";
+import ResultFound from "@/components/ResultFound";
+import Pagination from "@/components/Pagination";
+import {FETCH_LIMIT, NOT_FOUND_IMAGE_URL} from "@/constants/constants";
+import Loading from "@/components/Loading";
+
+const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
+    const { slug } = use(params);
+    const [query, setQuery] = useState("");
+    const [searchType, setSearchType] = useState("Title");
+    const [page, setPage] = useState<number>(1);
+
+    // slug looks lik OL23919A&page=1&limit=20 i want only OL23919A
+    const authorId = decodeURIComponent(slug).split("&")[0];
+
+
+    const { data, error, isLoading, responseCount, pageCount } = useAxios(`/authors/${authorId}/works.json?&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}`, "author");
+
+    console.log(data);
+    console.log(pageCount);
+
+    return (
+        <div className={`w-full h-full`}>
+            <div className={`w-full h-20`}>
+                <Navbar query={query} setQuery={setQuery} searchType={searchType} setSearchType={setSearchType} />
+            </div>
+            <div className={`w-full h-10 flex items-center justify-between`}>
+                <ResultFound count={responseCount} />
+                <pre>Author Id: {authorId}</pre>
+                <Pagination page={page} setPage={setPage} pageCount={pageCount} />
+            </div>
+            {
+                isLoading ? <div className={`w-full h-[calc(100vh-7.5rem)]`}><Loading /></div> : 
+                data ? (
+                    <div className={`w-full h-[calc(100vh-7.5rem)] gap-y-4 place-items-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 bg-[var(--background)] text-[var(--foreground)] overflow-x-hidden overflow-y-scroll scroll-smooth py-3`}>
+                        {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            data.entries ? data.entries.map((book: any, index: number) => (
+                                <Card 
+                                    key={index}
+                                    searchType={"Title"}
+                                    bookName={book.title}
+                                    imageUrl={NOT_FOUND_IMAGE_URL}
+                                    authorName={""}
+                                    // bookId={book.id}
+                                    authorId={authorId}
+                                />
+                            )) : <pre>No Data Entries Found</pre>
+                        } 
+                    </div>
+                ) : <pre>{error ? `Error: ${error}` : "No Data Found"}</pre>
+            }
+        </div>
+    )
+}
+
+export default AuthorPage;

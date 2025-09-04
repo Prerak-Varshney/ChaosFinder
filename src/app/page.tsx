@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
-import Book from "@/components/Book";
+import Card from "@/components/Card";
 import useAxios from "../hooks/useAxios";
 import ResultFound from "@/components/ResultFound";
 import Loading from "@/components/Loading";
@@ -14,7 +14,7 @@ export default function Home() {
   const [page, setPage] = useState<number>(1);
   const [searchType, setSearchType] = useState<string>("Title");
 
-  const { data, isLoading, responseCount, pageCount } = useAxios(searchType === 'Title' ? `/search.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}` : searchType === 'Author' ? `/search/authors.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}` : searchType === 'Genre' ? `` : ``);
+  const { data, error, isLoading, responseCount, pageCount } = useAxios(searchType === 'Title' ? `/search.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}` : searchType === 'Author' ? `/search/authors.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}` : searchType === 'Genre' ? `` : ``);
 
   useEffect(() => {console.log(data)}, [data]);
 
@@ -29,33 +29,37 @@ export default function Home() {
       </div>
       {
         isLoading ? <div className={`w-full h-[calc(100vh-7.5rem)]`}><Loading /></div> : 
-        <div className={`w-full h-[calc(100vh-7.5rem)] gap-y-4 place-items-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 bg-[var(--background)] text-[var(--foreground)] overflow-x-hidden overflow-y-scroll scroll-smooth py-3`}>
-        {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          data && data.docs.map((book: any, index: number) => {
-            return (
-              <Book 
-                bookId={
-                  searchType === 'Title' ? book.cover_edition_key :
-                  searchType === 'Author' ? book.author_key ? book.author_key.join(", ") : "Author ID not found" :
-                  searchType === 'Genre' ? book.id : "Genre Not Found"
-                }
-                bookName={
-                  searchType === 'Title' ? book.title :
-                  searchType === 'Author' ? book.name :
-                  searchType === 'Genre' ? book.genre_name : "Genre Not Found"
-                } 
-                authorName={book.author_name ? book.author_name.join(", ") : "Author Name Not Found"} 
-                key={index} 
-                imageUrl={
-                  searchType === 'Title' ? book.cover_i ? `${GET_IMAGE_URL}/${book.cover_i}.jpg` : NOT_FOUND_IMAGE_URL : 
-                  searchType === 'Author' ? book.key ? `${GET_IMAGE_URL}/${book.key}.jpg` : NOT_FOUND_IMAGE_URL : 
-                  searchType === 'Genre' ? book.genre_image ? `${GET_IMAGE_URL}/${book.genre_image}.jpg` : NOT_FOUND_IMAGE_URL : NOT_FOUND_IMAGE_URL
-              } />
-            )
-          })
-        }
-      </div>
+        (
+          data ? (
+            <div className={`w-full h-[calc(100vh-7.5rem)] gap-y-4 place-items-center grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 bg-[var(--background)] text-[var(--foreground)] overflow-x-hidden overflow-y-scroll scroll-smooth py-3`}>
+            {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              data.docs ? data.docs.map((book: any, index: number) => (
+                <Card 
+                  searchType={searchType}
+                  bookId={
+                    searchType === 'Title' ? book.cover_edition_key ? book.cover_edition_key : "Book ID not found" : "Book ID is not called here"
+                  }
+                  bookName={
+                    searchType === 'Title' ? book.title :
+                    searchType === 'Author' ? book.name :
+                    searchType === 'Genre' ? book.genre_name : "Genre Not Found"
+                  } 
+                  authorId={
+                    searchType === 'Author' ? book.key ? book.key : "Author ID not found" : "Author ID is not called here"
+                  }
+                  authorName={book.author_name ? book.author_name.join(", ") : ""} 
+                  key={index} 
+                  imageUrl={
+                    searchType === 'Title' ? book.cover_i ? `${GET_IMAGE_URL}/${book.cover_i}.jpg` : NOT_FOUND_IMAGE_URL : 
+                    searchType === 'Author' ? book.key ? `${GET_IMAGE_URL}/${book.key}.jpg` : NOT_FOUND_IMAGE_URL : 
+                    searchType === 'Genre' ? book.genre_image ? `${GET_IMAGE_URL}/${book.genre_image}.jpg` : NOT_FOUND_IMAGE_URL : NOT_FOUND_IMAGE_URL
+                } />
+              )) : <pre>No Data Docs Found</pre>
+            }
+            </div>
+          ) : <pre>{error ? `Error: ${error}` : "No Data Found"}</pre>
+        )
       }
     </div>
   );

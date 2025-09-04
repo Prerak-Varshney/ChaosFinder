@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { BASE_URL, FETCH_LIMIT } from "../constants/constants";
 import axios from "axios";
 
-const useAxios = (url: string) => {
+const useAxios = (url: string, type: "book" | "author" = "book") => {
   const [data, setData] = useState(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,8 +22,9 @@ const useAxios = (url: string) => {
         });
 
         setData(response.data);
-        setResponseCount(response.data.numFound);
-        setPageCount(Math.ceil(response.data.numFound / FETCH_LIMIT));
+        setResponseCount(() => type === 'book' ? response.data.numFound : response.data.size);
+        setPageCount(Math.ceil(responseCount / FETCH_LIMIT));
+
       } catch (err) {
         if (axios.isCancel(err)) {
           console.log("Request canceled:", err.message);
@@ -39,6 +40,8 @@ const useAxios = (url: string) => {
       clearTimeout(delay);
       controller.abort(); // cancel old request when url changes
     };
+    
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
 
   return { data, error, isLoading, responseCount, pageCount };
