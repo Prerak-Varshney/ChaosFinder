@@ -31,7 +31,12 @@ export default function Home() {
 
   const { data, error, isLoading, responseCount, pageCount } = useAxios(searchType === 'Title' ? `/search.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}` : searchType === 'Author' ? `/search/authors.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}` : searchType === 'Genre' ? `` : ``);
 
-  setBookData(data);
+  useEffect(() => {
+    if (data) {
+      setBookData(data);
+    }
+  }, [data]);
+
 
   useEffect(() => {console.log(data)}, [data]);
 

@@ -1,5 +1,5 @@
 "use client";
-import { use, useState } from "react";
+import { use, useEffect, useState } from "react";
 import useAxios from "@/hooks/useAxios";
 import Card from "@/components/Card";
 import Navbar from "@/components/Navbar";
@@ -30,7 +30,11 @@ const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
 
     const { data, error, isLoading, responseCount, pageCount } = useAxios(`/authors/${authorId}/works.json?&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}`, "author");
 
-    setAuthorData(data);
+    useEffect(() => {
+        if (data) {
+            setAuthorData(data);
+        }
+    }, [data]);
 
     return (
         <div className={`w-full h-full`}>
