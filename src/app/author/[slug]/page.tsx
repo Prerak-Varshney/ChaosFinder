@@ -68,7 +68,8 @@ const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                                 )) : <pre>No Data Entries Found</pre>
                             } 
                             </div>
-                            ) : <div className="w-full h-[calc(100vh-5rem)]">{error ? <Error error={error} /> : "No Data Found"}</div>
+                            ) : 
+                            <div className="w-full h-[calc(100vh-5rem)]">{error && <Error error={error} />}</div>
                         )
                     }
                 </div>

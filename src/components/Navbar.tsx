@@ -58,7 +58,7 @@ const Navbar = ({ query, setQuery, searchType, setSearchType }: NavbarProps) => 
 
     return (
         <div className={`w-full h-full bg-gray-950 border-b border-b-pink-300 text-white flex justify-between items-center px-10`}>
-            <h1 className="text-2xl lg:text-3xl font-bold">{BRAND_NAME}</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-pink-300">{BRAND_NAME}</h1>
             <div className={`w-110 hidden sm:flex items-center justify-center gap-2`}>
                 <div className={`w-50 lg:w-80 h-8 hidden sm:flex lg:h-10 bg-transparent text-white border rounded-lg transition-color duration-300 ${searchQueryLength > 0 ? "border-pink-300" : "border-white"} ${searchType === 'Genre' ? 'opacity-50 border-gray-500' : 'hover:border-pink-300'}`}>
                     <input type="text" placeholder={searchType === 'Genre' ? 'Coming Soon' : 'Search'} className={`w-full h-full bg-transparent outline-none px-4 rounded-lg`} value={searchType === 'Genre' ? 'Coming Soon' : query} onChange={(e) => setQuery(e.target.value)} disabled={searchType === 'Genre'} ref={searchInputRef} />

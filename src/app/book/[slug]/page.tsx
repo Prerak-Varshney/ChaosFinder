@@ -16,7 +16,7 @@ const BookPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     <div>
       {/* <Navbar /> */}
       <h1>Book: {decodeURIComponent(bookId)}</h1>
-      <div>{isLoading ? <Loading /> : error ? <Error error={error} /> : JSON.stringify(data, null, 2)}</div>
+      <div>{isLoading ? <Loading /> : error ? <Error error={error} /> : <pre>{JSON.stringify(data, null, 2)}</pre>}</div>
     </div>
   );
 };

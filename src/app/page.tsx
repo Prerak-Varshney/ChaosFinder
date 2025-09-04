@@ -29,11 +29,7 @@ export default function Home() {
   const [page, setPage] = useState<number>(1);
   const [searchType, setSearchType] = useState<string>("Title");
   const [bookData, setBookData] = useState<ApiResponse | null>(null);
-
-  //call the api only if query length is greater than 3
-  // if search type is genre then dont call the api
-  // if query is empty then dont call the api
-  const [shouldFetch, setShouldFetch] = useState<boolean>(true);
+  const shouldFetch = searchType !== "Genre" && query.length >= 3;
   const url = searchType === 'Title' ? `/search.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${page>0 ? (page-1)*FETCH_LIMIT : 0}` : searchType === 'Author' ? `/search/authors.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${page>0 ? (page-1)*FETCH_LIMIT : 0}` : searchType === 'Author' ? `/search/authors.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}` : searchType === 'Genre' ? `` : ``
 
   const { data, error, isLoading, responseCount, pageCount } = useAxios(shouldFetch ? url : "");
@@ -44,25 +40,13 @@ export default function Home() {
     }
   }, [data]);
 
-  useEffect(() => {
-    setPage(page <= 0 ? 0 : page);
-  }, [page]);
-
-
-  useEffect(() => {console.log(data)}, [data]);
+  // useEffect(() => {console.log(data)}, [data]);
 
   useEffect(() => {
-    if(query === "") setPage(0);
-    setShouldFetch((query.length >= 3) ? true : false);
-  }, [query]);
+    if(query.length <= 3 || searchType === 'Genre') setPage(0);
+  }, [query, searchType]);
 
-  useEffect(() => {
-    if(searchType === 'Genre'){
-      setQuery('');
-      setPage(0);
-    }
-    setShouldFetch(searchType !== 'Genre' ? true : false);
-  }, [searchType]);
+
 
   return (
     <div className={`w-full h-full`}>
@@ -74,7 +58,8 @@ export default function Home() {
         <Pagination page={page} setPage={setPage} pageCount={pageCount} />
       </div>
       {
-        searchType === 'Genre' ? <div className={`w-full h-[calc(100vh-5rem)] flex items-center justify-center text-black text-2xl font-bold`}><h1>Comming Soon...</h1></div> : (
+        // searchType === 'Genre' && !shouldFetch ? <div className={`w-full h-[calc(100vh-5rem)] flex items-center justify-center text-black text-2xl font-bold`}><h1>Comming Soon...</h1></div> :  (
+        !shouldFetch ? <div className={`w-full h-[calc(100vh-5rem)]`}><Welcome /></div> : searchType === 'Genre' && !shouldFetch ? <div className={`w-full h-[calc(100vh-5rem)] flex items-center justify-center text-black text-2xl font-bold`}><h1>Comming Soon...</h1></div> : (
           <>
             {
               isLoading ? <div className={`w-full h-[calc(100vh-5rem)]`}><Loading /></div> : 
@@ -104,23 +89,11 @@ export default function Home() {
                           searchType === 'Author' ? book.key ? `${GET_IMAGE_URL}/${book.key}.jpg` : NOT_FOUND_IMAGE_URL : 
                           searchType === 'Genre' ? book.genre_image ? `${GET_IMAGE_URL}/${book.genre_image}.jpg` : NOT_FOUND_IMAGE_URL : NOT_FOUND_IMAGE_URL
                       } />
-                    )) : <div className="w-full h-[calc(100vh-5rem)]">{error ? <Error error={error} /> : "Some Error Occured"}</div>
+                    )) : <div className="w-full h-[calc(100vh-5rem)]">{error ? <Error error={error} /> : <Error error={"Ohoo, Some Problem Occured"} />}</div>
                   }
                   </div>
-                  // <Error error={error} />
                 ) : 
-                  <div className="w-full h-[calc(100vh-5rem)]">
-                    {
-                      error ? (
-                        <>
-                          {setTimeout(() => {<Error error={error} />}, 5000)}
-                          {/* <Welcome /> */}
-                        </>
-                      ) : (
-                        <Welcome />
-                      )
-                    }
-                  </div>
+                  <div className="w-full h-[calc(100vh-5rem)]">{error && <Error error={error} />}</div>
               )
             }
           </>
@@ -130,9 +103,3 @@ export default function Home() {
     </div>
   );
 }
-
-// When clicked on authors there should be all their works
-// When click on book show other details of book and the other works from the same author
-// Add to favourite
-// Responsive and Design edit
-// FavIcon and stuff
