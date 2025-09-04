@@ -6,7 +6,7 @@ import axios from "axios";
 const useAxios = (url: string, type: "book" | "author" = "book") => {
   const [data, setData] = useState(null);
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [responseCount, setResponseCount] = useState<number>(0);
   const [pageCount, setPageCount] = useState<number>(0);
 

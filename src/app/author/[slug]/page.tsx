@@ -27,8 +27,7 @@ const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     // slug looks lik OL23919A&page=1&limit=20 i want only OL23919A
     const authorId = decodeURIComponent(slug).split("&")[0];
 
-
-    const { data, error, isLoading, responseCount, pageCount } = useAxios(`/authors/${authorId}/works.json?&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}`, "author");
+    const { data, error, isLoading, responseCount, pageCount } = useAxios(`/authors/${authorId}/works.json?&page=${page}&limit=${FETCH_LIMIT}&offset=${page>0 ? (page-1)*FETCH_LIMIT : 0}`, "author");
 
     useEffect(() => {
         if (data) {

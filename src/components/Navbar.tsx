@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState, useMemo, useEffect } from "react";
 import { BRAND_NAME, SEARCH_TYPES } from "@/constants/constants";
+import { useSharedRef } from "../app/context/RefContext";
 import Select from "./Select";
 
 // import Home, Bookmark and My List icons from lucid-react
@@ -15,12 +16,13 @@ interface NavbarProps {
 }
 const Navbar = ({ query, setQuery, searchType, setSearchType }: NavbarProps) => {
     const items = [
-    { name: "Home", icon: <FaHome /> },
-    { name: "Saved", icon: <FaBookmark /> },
-    { name: "My List", icon: <FaList /> },
-  ];
+        { name: "Home", icon: <FaHome /> },
+        { name: "Saved", icon: <FaBookmark /> },
+        { name: "My List", icon: <FaList /> },
+    ];
 
     const [searchQueryLength, setSearchQueryLength] = useState<number>(0);
+    const searchInputRef = useSharedRef();
 
     useMemo(() => {
         setSearchQueryLength(query.length);
@@ -55,11 +57,11 @@ const Navbar = ({ query, setQuery, searchType, setSearchType }: NavbarProps) => 
     }, [searchType])
 
     return (
-        <div className={`w-full h-full bg-gray-900 text-white flex justify-between items-center px-10`}>
+        <div className={`w-full h-full bg-gray-950 border-b border-b-pink-300 text-white flex justify-between items-center px-10`}>
             <h1 className="text-2xl lg:text-3xl font-bold">{BRAND_NAME}</h1>
             <div className={`w-110 hidden sm:flex items-center justify-center gap-2`}>
                 <div className={`w-50 lg:w-80 h-8 hidden sm:flex lg:h-10 bg-transparent text-white border rounded-lg transition-color duration-300 ${searchQueryLength > 0 ? "border-pink-300" : "border-white"} ${searchType === 'Genre' ? 'opacity-50 border-gray-500' : 'hover:border-pink-300'}`}>
-                    <input type="text" placeholder={searchType === 'Genre' ? 'Coming Soon' : 'Search'} className={`w-full h-full bg-transparent outline-none px-4 rounded-lg`} value={searchType === 'Genre' ? 'Coming Soon' : query} onChange={(e) => setQuery(e.target.value)} disabled={searchType === 'Genre'} />
+                    <input type="text" placeholder={searchType === 'Genre' ? 'Coming Soon' : 'Search'} className={`w-full h-full bg-transparent outline-none px-4 rounded-lg`} value={searchType === 'Genre' ? 'Coming Soon' : query} onChange={(e) => setQuery(e.target.value)} disabled={searchType === 'Genre'} ref={searchInputRef} />
                 </div>
                 <Select options={SEARCH_TYPES} searchType={searchType} setSearchType={setSearchType} />
             </div>
@@ -68,7 +70,7 @@ const Navbar = ({ query, setQuery, searchType, setSearchType }: NavbarProps) => 
                 {
                     items.map((item, index) => (
                         <Link href={"/"} key={index} className={`rounded-full text-sm font-bold flex items-center justify-center transition-all duration-300 ${index === 0 ? "text-pink-300 hover:animate-bounce" : "text-white hover:text-pink-300"}`}>
-                            <pre className="hidden lg:inline text-md">{item.name}</pre>
+                            <span className="hidden lg:inline text-md">{item.name}</span>
                             <span className="lg:hidden text-md sm:text-lg">{item.icon}</span>
                         </Link>
                     ))

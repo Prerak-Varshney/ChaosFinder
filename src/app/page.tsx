@@ -7,6 +7,7 @@ import ResultFound from "@/components/ResultFound";
 import Loading from "@/components/Loading";
 import Pagination from "@/components/Pagination";
 import Error from "@/components/Error";
+import Welcome from "@/components/Welcome";
 import { FETCH_LIMIT, NOT_FOUND_IMAGE_URL, GET_IMAGE_URL } from "../constants/constants";
 
 interface ApiResponse {
@@ -29,7 +30,13 @@ export default function Home() {
   const [searchType, setSearchType] = useState<string>("Title");
   const [bookData, setBookData] = useState<ApiResponse | null>(null);
 
-  const { data, error, isLoading, responseCount, pageCount } = useAxios(searchType === 'Title' ? `/search.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}` : searchType === 'Author' ? `/search/authors.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}` : searchType === 'Genre' ? `` : ``);
+  //call the api only if query length is greater than 3
+  // if search type is genre then dont call the api
+  // if query is empty then dont call the api
+  const [shouldFetch, setShouldFetch] = useState<boolean>(true);
+  const url = searchType === 'Title' ? `/search.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${page>0 ? (page-1)*FETCH_LIMIT : 0}` : searchType === 'Author' ? `/search/authors.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${page>0 ? (page-1)*FETCH_LIMIT : 0}` : searchType === 'Author' ? `/search/authors.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}` : searchType === 'Genre' ? `` : ``
+
+  const { data, error, isLoading, responseCount, pageCount } = useAxios(shouldFetch ? url : "");
 
   useEffect(() => {
     if (data) {
@@ -37,16 +44,24 @@ export default function Home() {
     }
   }, [data]);
 
+  useEffect(() => {
+    setPage(page <= 0 ? 0 : page);
+  }, [page]);
+
 
   useEffect(() => {console.log(data)}, [data]);
 
   useEffect(() => {
     if(query === "") setPage(0);
+    setShouldFetch((query.length >= 3) ? true : false);
   }, [query]);
 
   useEffect(() => {
-    if(searchType === 'Genre') setQuery('');
-    setPage(0);
+    if(searchType === 'Genre'){
+      setQuery('');
+      setPage(0);
+    }
+    setShouldFetch(searchType !== 'Genre' ? true : false);
   }, [searchType]);
 
   return (
@@ -54,7 +69,7 @@ export default function Home() {
       <div className={`w-full h-20`}>
         <Navbar query={query} setQuery={setQuery} searchType={searchType} setSearchType={setSearchType} />
       </div>
-      <div className={`w-full ${isLoading || error ? 'hidden' : 'flex'} h-10 items-center justify-between`}>
+      <div className={`w-full ${isLoading || error || !shouldFetch ? 'hidden' : 'flex'} h-10 items-center justify-between`}>
         <ResultFound count={responseCount} />
         <Pagination page={page} setPage={setPage} pageCount={pageCount} />
       </div>
@@ -89,10 +104,23 @@ export default function Home() {
                           searchType === 'Author' ? book.key ? `${GET_IMAGE_URL}/${book.key}.jpg` : NOT_FOUND_IMAGE_URL : 
                           searchType === 'Genre' ? book.genre_image ? `${GET_IMAGE_URL}/${book.genre_image}.jpg` : NOT_FOUND_IMAGE_URL : NOT_FOUND_IMAGE_URL
                       } />
-                    )) : <pre>No Data Docs Found</pre>
+                    )) : <div className="w-full h-[calc(100vh-5rem)]">{error ? <Error error={error} /> : "Some Error Occured"}</div>
                   }
                   </div>
-                ) : <div className="w-full h-[calc(100vh-5rem)]">{error ? <Error error={error} /> : "No Data Found"}</div>
+                  // <Error error={error} />
+                ) : 
+                  <div className="w-full h-[calc(100vh-5rem)]">
+                    {
+                      error ? (
+                        <>
+                          {setTimeout(() => {<Error error={error} />}, 5000)}
+                          {/* <Welcome /> */}
+                        </>
+                      ) : (
+                        <Welcome />
+                      )
+                    }
+                  </div>
               )
             }
           </>
