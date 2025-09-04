@@ -40,7 +40,7 @@ export default function Home() {
     }
   }, [data]);
 
-  // useEffect(() => {console.log(data)}, [data]);
+  useEffect(() => {console.log(data)}, [data]);
 
   useEffect(() => {
     if(query.length <= 3 || searchType === 'Genre') setPage(1);

@@ -30,6 +30,7 @@ const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
     useEffect(() => {
         if (data) {
             setAuthorData(data);
+            console.log(data);
         }
     }, [data]);
 
