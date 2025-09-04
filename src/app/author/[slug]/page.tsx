@@ -5,7 +5,7 @@ import Card from "@/components/Card";
 import Navbar from "@/components/Navbar";
 import ResultFound from "@/components/ResultFound";
 import Pagination from "@/components/Pagination";
-import {FETCH_LIMIT, NOT_FOUND_IMAGE_URL} from "@/constants/constants";
+import {FETCH_LIMIT, NOT_FOUND_IMAGE_URL, GET_IMAGE_URL} from "@/constants/constants";
 import Loading from "@/components/Loading";
 import Error from "@/components/Error";
 
@@ -59,7 +59,7 @@ const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
                                         key={index}
                                         searchType={"Title"}
                                         bookName={book.title}
-                                        imageUrl={NOT_FOUND_IMAGE_URL}
+                                        imageUrl={book.covers && book.covers.length > 0 ? `${GET_IMAGE_URL}/${book.cover_i}` : NOT_FOUND_IMAGE_URL}
                                         authorName={""}
                                         // bookId={book.id}
                                         authorId={authorId}

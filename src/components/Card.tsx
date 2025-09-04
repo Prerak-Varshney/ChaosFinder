@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { NOT_FOUND_IMAGE_URL } from "../constants/constants";
 interface CardProps {
     searchType?:string;
     bookId?: string;
@@ -24,7 +25,7 @@ const Card = ({
             href={searchType === "Title" ? `/book/${encodeURIComponent(bookId)}` : `/author/${encodeURIComponent(authorId)}`}
         >
             <div className={`w-full h-4/5 rounded-3xl`}>
-                <Image src={imageUrl} alt={"Image"} className={`w-full h-full object-cover rounded-3xl`} width={200} height={300} priority={false} />
+                <Image src={imageUrl !== "" ? imageUrl : NOT_FOUND_IMAGE_URL} alt={"Image"} className={`w-full h-full object-cover rounded-3xl`} width={200} height={300} priority={false} />
             </div>
             <div className={`w-full h-1/5 flex flex-col justify-center items-start`}>
                 <span className={`text-xl font-bold w-full h-10 p-2 flex items-center justify-start`}>{bookName}</span>
