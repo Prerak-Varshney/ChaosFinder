@@ -17,9 +17,9 @@ export const metadata: Metadata = {
   title: "ChaosFinder",
   description: "Find your next favorite book with ChaosFinder - the ultimate book search engine.",
   icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
-    apple: "/favicon.png",
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
   },
 };
 
