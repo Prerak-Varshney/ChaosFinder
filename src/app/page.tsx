@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Card from "@/components/Card";
 import useAxios from "../hooks/useAxios";
+import useQuery from "../hooks/useQuery";
 import ResultFound from "@/components/ResultFound";
 import Loading from "@/components/Loading";
 import Pagination from "@/components/Pagination";
@@ -24,7 +25,7 @@ interface ApiResponse {
 }
 
 export default function Home() {
-
+  
   const [query, setQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [searchType, setSearchType] = useState<string>("Title");
@@ -33,6 +34,8 @@ export default function Home() {
   const url = searchType === 'Title' ? `/search.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${page>0 ? (page-1)*FETCH_LIMIT : 0}` : searchType === 'Author' ? `/search/authors.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${page>0 ? (page-1)*FETCH_LIMIT : 0}` : searchType === 'Author' ? `/search/authors.json?q=${query}&page=${page}&limit=${FETCH_LIMIT}&offset=${(page - 1) * FETCH_LIMIT}` : searchType === 'Genre' ? `` : ``
 
   const { data, error, isLoading, responseCount, pageCount } = useAxios(shouldFetch ? url : "");
+
+  useQuery(query, searchType, page, FETCH_LIMIT, page>0 ? (page-1)*FETCH_LIMIT : 0);
 
   useEffect(() => {
     if (data) {
@@ -46,12 +49,15 @@ export default function Home() {
     if(query.length <= 3 || searchType === 'Genre') setPage(1);
   }, [query, searchType]);
 
-
-
   return (
     <div className={`w-full h-full`}>
       <div className={`w-full h-20`}>
-        <Navbar query={query} setQuery={setQuery} searchType={searchType} setSearchType={setSearchType} />
+        <Navbar 
+          query={query} 
+          setQuery={setQuery} 
+          searchType={searchType} 
+          setSearchType={setSearchType} 
+        />
       </div>
       <div className={`w-full ${isLoading || error || !shouldFetch ? 'hidden' : 'flex'} h-10 items-center justify-between`}>
         <ResultFound count={responseCount} />

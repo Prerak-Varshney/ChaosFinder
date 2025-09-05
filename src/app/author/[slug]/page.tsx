@@ -1,6 +1,7 @@
 "use client";
 import { use, useEffect, useState } from "react";
 import useAxios from "@/hooks/useAxios";
+import useQuery from "@/hooks/useQuery";
 import Card from "@/components/Card";
 import Navbar from "@/components/Navbar";
 import ResultFound from "@/components/ResultFound";
@@ -8,6 +9,7 @@ import Pagination from "@/components/Pagination";
 import {FETCH_LIMIT, NOT_FOUND_IMAGE_URL, GET_IMAGE_URL} from "@/constants/constants";
 import Loading from "@/components/Loading";
 import Error from "@/components/Error";
+import { useHandleKeyPressQuery } from "@/hooks/useQuery";
 
 interface ApiResponse {
     entries?: Array<{
@@ -27,6 +29,8 @@ const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
 
     const { data, error, isLoading, responseCount, pageCount } = useAxios(`/authors/${authorId}/works.json?&page=${page}&limit=${FETCH_LIMIT}&offset=${page>0 ? (page-1)*FETCH_LIMIT : 0}`, "author");
 
+    useQuery(query, searchType)
+
     useEffect(() => {
         if (data) {
             setAuthorData(data);
@@ -34,10 +38,20 @@ const AuthorPage = ({ params }: { params: Promise<{ slug: string }> }) => {
         }
     }, [data]);
 
+
+    const handleKeyDown = useHandleKeyPressQuery(query, searchType, page, FETCH_LIMIT, page>0 ? (page-1)*FETCH_LIMIT : 0);
+
     return (
         <div className={`w-full h-full`}>
             <div className={`w-full h-20`}>
-                <Navbar query={query} setQuery={setQuery} searchType={searchType} setSearchType={setSearchType} isSearchHidden={true} />
+                <Navbar 
+                query={query} 
+                setQuery={setQuery} 
+                searchType={searchType} 
+                setSearchType={setSearchType} 
+                isSearchHidden={false} 
+                onHandleKey={handleKeyDown} 
+            />
             </div>
             <div className={`w-full ${isLoading || error ? 'hidden' : 'flex'} h-10 items-center justify-between`}>
                 <ResultFound count={responseCount} />

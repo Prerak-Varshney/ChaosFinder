@@ -4,8 +4,6 @@ import { useState, useMemo, useEffect } from "react";
 import { BRAND_NAME, SEARCH_TYPES } from "@/constants/constants";
 import { useSharedRef } from "../app/context/RefContext";
 import Select from "./Select";
-
-// import Home, Bookmark and My List icons from lucid-react
 import { FaSearch, FaHome, FaBookmark, FaList } from "react-icons/fa";
 
 interface NavbarProps {
@@ -14,8 +12,9 @@ interface NavbarProps {
     searchType: string;
     setSearchType: (searchType: string) => void;
     isSearchHidden?: boolean;
+    onHandleKey?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
 }
-const Navbar = ({ query, setQuery, searchType, setSearchType, isSearchHidden = false }: NavbarProps) => {
+const Navbar = ({ query, setQuery, searchType, setSearchType, isSearchHidden = false, onHandleKey }: NavbarProps) => {
     const items = [
         { name: "Home", icon: <FaHome /> },
         { name: "Saved", icon: <FaBookmark /> },
@@ -31,17 +30,17 @@ const Navbar = ({ query, setQuery, searchType, setSearchType, isSearchHidden = f
     
     useEffect(() => {
         const storedSearchQuery = sessionStorage.getItem("searchQuery");
+        const storedSearchType = sessionStorage.getItem("searchType");
+
         if (storedSearchQuery) {
             setQuery(storedSearchQuery);
         }
-    }, [setQuery]);
-
-    useEffect(() => {
-        const storedSearchType = sessionStorage.getItem("searchType");
         if (storedSearchType) {
             setSearchType(storedSearchType);
         }
-    }, [setSearchType]);
+        
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         if(searchQueryLength >= 3){
@@ -49,20 +48,29 @@ const Navbar = ({ query, setQuery, searchType, setSearchType, isSearchHidden = f
         }else{
             sessionStorage.removeItem("searchQuery");
         }
-    }, [query, setQuery, searchQueryLength]);
-
-    useEffect(() => {
         if (searchType) {
             sessionStorage.setItem("searchType", searchType);
         }
-    }, [searchType])
+    }, [query, searchQueryLength, searchType]);
+
 
     return (
         <div className={`w-full h-full bg-gray-950 border-b border-b-pink-300 text-white flex justify-between items-center px-10`}>
             <h1 className="text-2xl lg:text-3xl font-bold text-pink-300">{BRAND_NAME}</h1>
             <div className={`w-110  items-center justify-center gap-2 ${isSearchHidden ? 'hidden' : 'hidden sm:flex'}`}>
                 <div className={`w-50 lg:w-80 h-8 hidden sm:flex lg:h-10 bg-transparent text-white border rounded-lg transition-color duration-300 ${searchQueryLength > 0 ? "border-pink-300" : "border-white"} ${searchType === 'Genre' ? 'opacity-50 border-gray-500' : 'hover:border-pink-300'}`}>
-                    <input type="text" placeholder={searchType === 'Genre' ? 'Coming Soon' : 'Search'} className={`w-full h-full bg-transparent outline-none px-4 rounded-lg`} value={searchType === 'Genre' ? 'Coming Soon' : query} onChange={(e) => setQuery(e.target.value)} disabled={searchType === 'Genre'} ref={searchInputRef} />
+                    <input 
+                        ref={searchInputRef} 
+                        type="text" 
+                        placeholder={searchType === 'Genre' ? 'Coming Soon' : 'Search'} 
+                        className={`w-full h-full bg-transparent outline-none px-4 rounded-lg`} value={searchType === 'Genre' ? 'Coming Soon' : query} 
+                        onChange={(e) => setQuery(e.target.value)} 
+                        disabled={searchType === 'Genre'} 
+                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                            if(onHandleKey) onHandleKey(e);
+                            console.log("No Enter");
+                        }} 
+                    />
                 </div>
                 <Select options={SEARCH_TYPES} searchType={searchType} setSearchType={setSearchType} />
             </div>
